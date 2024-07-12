@@ -1,8 +1,12 @@
 import express from "express";
 import path from "path";
 import posts from "./routes/posts.js";
+import logger from "./middleware/logger.js";
 
 const app = express();
+
+// logger middleware
+app.use(logger);
 
 // setup static folder
 app.use(express.static(path.join(__dirname, "public")));
