@@ -17,47 +17,62 @@ router.get("/", (req, res) => {
 });
 
 // Get a single post
-router.get("/:id", (req, res) => {
+router.get("/:id", (req, res, next) => {
   const id = parseInt(req.params.id);
   const post = posts.find((post) => post.id === id);
 
-  if (!post) return res.status(404).json({ message: `No post with id ${id}` });
+  if (!post) {
+    const error = new Error(`No post with id ${id}`);
+    error.status = 404;
+    return next(error);
+  }
   res.status(200).json(post);
 });
 
 // Create new post
-router.post("/", (req, res) => {
+router.post("/", (req, res, next) => {
   const newPost = {
     id: posts.length + 1,
     title: req.body.title,
   };
 
-  if (!newPost.title)
-    return res.status(400).json({ message: "Please include a title" });
+  if (!newPost.title) {
+    const error = new Error("Please include a title");
+    error.status = 400;
+    return next(error);
+  }
   posts.push(newPost);
-  req.status(201).json(posts);
+  res.status(201).json(posts);
 });
 
 // Update post
-router.put("/:id", (req, res) => {
+router.put("/:id", (req, res, next) => {
   const id = parseInt(req.params.id);
   const post = posts.find((post) => post.id === id);
 
-  if (!post) return res.status(404).json({ message: `No post with id ${id}` });
+  if (!post) {
+    const error = new Error(`No post with id ${id}`);
+    error.status = 404;
+    return next(error);
+  }
 
   post.title = req.body.title;
   res.status(200).json(post);
 });
 
 // Delete post
-router.delete('/:id', (req, res)=> {
+router.delete("/:id", (req, res, next) => {
   const id = parseInt(req.params.id);
-  const post = posts.find((post)=> post.id === id);
-  
-  if(!post) return res.status(404).json({message: `No post with id ${id}`})
-  
-  posts = posts.filter((post)=> post.id !== id);
+  const post = posts.find((post) => post.id === id);
+
+  if (!post) {
+    const error = new Error(`No post with id ${id}`)
+    error.status = 404;
+    return next(error);
+  }
+
+  posts = posts.filter((post) => post.id !== id);
   res.status(200).json(posts);
-})
+});
 
 export default router;
